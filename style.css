@@ -1,0 +1,22 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    /* Fundo cinza escuro para destacar o canvas */
+    background-color: #222;  
+    /* Centraliza o canvas na tela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden; /* Evita barras de rolagem */
+}
+
+canvas {
+    /* A tela preta solicitada */
+    background-color: black;
+    /* Uma sombra suave para dar destaque */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    /* Borda fina branca (opcional, ajuda a ver os limites) */
+    border: 1px solid #444;
+}
