@@ -14,4 +14,12 @@ function limpar_tela() {
     ctx.clearRect(0, 0, largura_tela, altura_tela);
 }
 
-export { desenhar_jogador, limpar_tela };
+function zoom_in(zoom) {
+    zoom.value += 1;
+}
+
+function zoom_out(zoom) {
+    zoom.value -= 1;
+}
+
+export { desenhar_jogador, limpar_tela, zoom_in, zoom_out };

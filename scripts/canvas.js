@@ -10,4 +10,7 @@ const largura_tela = canvas.width;
 canvas.height = 600;
 const altura_tela = canvas.height;
 
-export { ctx, largura_tela, altura_tela };
+// Zoom da tela
+let zoom = { value: 0.0 };
+
+export { ctx, largura_tela, altura_tela, zoom };

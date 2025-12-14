@@ -1,8 +1,6 @@
 // Esse é o módulo que controla a bolinha do jogador
 
-// Módulos importados
-// Canvas
-import { ctx, largura_tela, altura_tela } from './canvas.js';
+import { ctx, largura_tela, altura_tela, zoom } from './canvas.js';
 
 // Definição da Bolinha do Jogador (Objeto)
 const Jogador = {
@@ -15,7 +13,7 @@ const Jogador = {
         // Inicia o desenho
         ctx.beginPath();
         // Cria um círculo: arc(pos x, pos y, raio, ang inicial, ang final)
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.r + zoom.value, 0, Math.PI * 2);
         // Define a cor de preenchimento  
         ctx.fillStyle = this.cor;
         // Preenche o círculo
