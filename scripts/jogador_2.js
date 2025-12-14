@@ -8,8 +8,8 @@ const Jogador_2 = {
     x_virtual: (largura_tela_real/4)*zoom.valor, //x_real*zoom.valor
     y_real: altura_tela_real / 2,
     y_virtual: (altura_tela_real/2)*zoom.valor, //y_real*zoom.valor
-    r_real: 20,
-    r_virtual: 20*zoom.valor, //r_real*zoom.valor         
+    r_real: 5,
+    r_virtual: 5*zoom.valor, //r_real*zoom.valor         
     cor: '#39db34ff',
 
     desenhar() {
