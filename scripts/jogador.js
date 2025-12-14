@@ -1,3 +1,4 @@
+// jogador.js
 // Esse é o módulo que controla a bolinha do jogador
 
 import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';

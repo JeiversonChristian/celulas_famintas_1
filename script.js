@@ -1,8 +1,9 @@
+// script.js
 // Esse é o script principal da simulação - ele usa todos os outros módulos
 
 // Módulos importados
 // Funções
-import { desenhar_jogadores, limpar_tela, zoom_in, zoom_out, aplicar_zoom, mover_camera } from './scripts/funcoes.js';
+import { desenhar_mundo, limpar_tela, zoom_in, zoom_out, mover_camera } from './scripts/funcoes.js';
 
 // Estado do Mouse
 let mouseX = 0;
@@ -77,10 +78,9 @@ function loop_simulacao() {
     // Limpa a tela antes de desenhar o próximo quadro
     limpar_tela();
 
-    aplicar_zoom();
     
     // O jogador é a bolinha controlada pela gente e a outra
-    desenhar_jogadores();    
+    desenhar_mundo();    
     
     // Solicita ao navegador para chamar essa função novamente no próximo quadro
     requestAnimationFrame(loop_simulacao);

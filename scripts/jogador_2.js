@@ -1,3 +1,4 @@
+// jogador_2.js
 // Esse é o módulo que controla a bolinha do jogador
 
 import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
@@ -10,7 +11,7 @@ const Jogador_2 = {
     y_virtual: (altura_tela_real/2)*zoom.valor, //y_real*zoom.valor
     r_real: 5,
     r_virtual: 5*zoom.valor, //r_real*zoom.valor         
-    cor: '#39db34ff',
+    cor: '#db3934ff',
 
     desenhar() {
         // Inicia o desenho
