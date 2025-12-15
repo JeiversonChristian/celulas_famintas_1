@@ -6,17 +6,23 @@
 import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
 // Células
 import { gerar_celulas, desenhar_todas_celulas } from './celulas.js';
+// Comidas
+import { gerar_comidas, desenhar_todas_comidas } from './comidas.js';
 
 // Variáveis persistentes de deslocamento ---
 // Elas guardam a posição da câmera. Começam em 0.
 let deslocamento_x = 0;
 let deslocamento_y = 0;
 
-// --- GERA AS CÉLULAS ASSIM QUE O MÓDULO CARREGA ---
+// Gera tudo ao iniciar
 gerar_celulas();
+gerar_comidas();
 
 function desenhar_mundo() {
-    // Passamos o deslocamento X e Y para elas saberem onde se desenhar
+    // 1. Desenha Comidas (Ficam no chão)
+    desenhar_todas_comidas(deslocamento_x, deslocamento_y);
+
+    // 2. Desenha Células (Ficam por cima)
     desenhar_todas_celulas(deslocamento_x, deslocamento_y);
 }
 
