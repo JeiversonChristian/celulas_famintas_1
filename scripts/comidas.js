@@ -1,9 +1,11 @@
+// comidas.js
+
 import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
 
 // --- ATENÇÃO: Copiei os valores aqui para evitar Dependência Circular ---
 // (Não podemos importar de celulas.js se celulas.js importar daqui)
-const TAMANHO_MAPA_CELULAS = 2000;
-const QTD_MAX_CELULAS = 500;
+const TAMANHO_MAPA_CELULAS = 500;
+const QTD_MAX_CELULAS = 200;
 
 // Configurações da Comida
 const TAMANHO_MAPA = TAMANHO_MAPA_CELULAS * 1.5; // 50% maior

@@ -1,10 +1,12 @@
+// celulas.js
+
 import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
 import { lista_comidas } from './comidas.js'; 
 
 // --- CONFIGURAÇÕES ---
-const QUANTIDADE_MIN = 300;
-export const QTD_MAX_CELULAS = 500;
-export const TAMANHO_MAPA_CELULAS = 2000; 
+const QUANTIDADE_MIN = 50;
+export const QTD_MAX_CELULAS = 200;
+export const TAMANHO_MAPA_CELULAS = 500; 
 const RAIO_CELULA = 7;
 const RAIO_VISAO = 150; // Aumentei um pouco para elas verem melhor
 
