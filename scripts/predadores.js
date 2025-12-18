@@ -1,42 +1,35 @@
-// celulas.js
+// preadores.js
 
 import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
-import { lista_comidas, notificar_comida_comida } from './comidas.js'; 
+// Importamos a lista de células (presas) e o limite do mundo
+import { lista_celulas, LIMITE_MORTAL, TAMANHO_MAPA_CELULAS } from './celulas.js';
 
-// --- CONFIGURAÇÕES DE EQUILÍBRIO ---
-const QUANTIDADE_MIN = 300; 
-export const QTD_MAX_CELULAS = 500;
+// --- CONFIGURAÇÕES DOS PREDADORES ---
+const QUANTIDADE_MIN = 50;
+const QTD_MAX_PREDADORES = 100;
 
-// Mapa onde elas NASCEM
-export const TAMANHO_MAPA_CELULAS = 900; 
+const RAIO_PREDADOR = 14; // Dobro do tamanho (7 * 2)
+const RAIO_VISAO = 500;   // Visão aguçada para caça
 
-// LIMITE MORTAL: Ajustado para ficar logo depois da comida (que vai até 1350)
-// Se for muito longe, elas vagam no vazio e a simulação fica lenta/chata.
-export const LIMITE_MORTAL = 2000; 
+const VIDA_INICIAL = 400;
+const VIDA_MAXIMA = 400;
+const PERDA_POR_FRAME = 0.06; // Gasta mais energia que a célula normal
+const GANHO_AO_COMER = 100;  // Comer uma presa enche bastante a barriga
 
-const RAIO_CELULA = 7;
-const RAIO_VISAO = 200; 
+const COOLDOWN_REPRODUCAO = 400; // Reprodução mais lenta
+const TAXA_MUTACAO = 0.1; 
+const CUSTO_REPRODUCAO = 80;     // Custa caro reproduzir
+const VELOCIDADE_MAXIMA = 4.2;   // Levemente mais rápidos que as presas (4.0)
 
-// Economia de Vida (Sobrevivência facilitada no início)
-const VIDA_INICIAL = 150;
-const VIDA_MAXIMA = 150;
-const PERDA_POR_FRAME = 0.02; // Perde pouco (dura ~80s)
-const GANHO_COMIDA = 30;      // Ganha razoável
+const INTERVALO_PENSAMENTO = 3;
 
-const COOLDOWN_REPRODUCAO = 300; 
-const TAXA_MUTACAO = 0.15;       
-const CUSTO_REPRODUCAO = 50;     
-const VELOCIDADE_MAXIMA = 4;
-
-const INTERVALO_PENSAMENTO = 3; 
-
-export const lista_celulas = [];
+export const lista_predadores = [];
 
 function random_gene() {
     return (Math.random() * 2) - 1; 
 }
 
-class Celula {
+class Predador {
     constructor(genes_herdados = null, x_nasc = null, y_nasc = null) {
         if (x_nasc !== null) {
             this.x_real = x_nasc;
@@ -46,28 +39,30 @@ class Celula {
             this.y_real = (Math.random() * TAMANHO_MAPA_CELULAS * 2) - TAMANHO_MAPA_CELULAS;
         }
         
-        this.raio_real = RAIO_CELULA;
-        
+        this.raio_real = RAIO_PREDADOR;
         this.tick_interno = Math.floor(Math.random() * INTERVALO_PENSAMENTO);
         this.vel_x_cache = 0;
         this.vel_y_cache = 0;
 
+        // Sensores (Presa = Comida, Vizinho = Outro Predador)
         this.sensor = {
-            comida_esq: 0, comida_dir: 0, comida_cima: 0, comida_baixo: 0,
+            presa_esq: 0, presa_dir: 0, presa_cima: 0, presa_baixo: 0,
             vizinho_esq: 0, vizinho_dir: 0, vizinho_cima: 0, vizinho_baixo: 0
         };
 
         if (genes_herdados) {
             this.genes = genes_herdados;
         } else {
-            // Geração Zero mais agitada
+            // Predadores nascem agressivos (Bias alto para movimento)
             this.genes = {
                 bias_x: (Math.random() * 2) - 1,
                 bias_y: (Math.random() * 2) - 1,
                 
-                w_comida_esq_x: random_gene(), w_comida_dir_x: random_gene(),
-                w_comida_cima_y: random_gene(), w_comida_baixo_y: random_gene(),
+                // Pesos para PRESAS (Células Normais)
+                w_presa_esq_x: random_gene(), w_presa_dir_x: random_gene(),
+                w_presa_cima_y: random_gene(), w_presa_baixo_y: random_gene(),
 
+                // Pesos para VIZINHOS (Outros Predadores)
                 w_vizinho_esq_x: random_gene(), w_vizinho_dir_x: random_gene(),
                 w_vizinho_cima_y: random_gene(), w_vizinho_baixo_y: random_gene(),
 
@@ -78,12 +73,14 @@ class Celula {
 
         this.vida = VIDA_INICIAL;
         this.cooldown_reproducao = 0;
-        this.cor_preenchimento = '#00008B';
-        this.cor_neon = '#0026ffff';
+        
+        // Aparência
+        this.cor_preenchimento = '#8B0000'; // Vermelho Escuro
+        this.cor_neon = '#FF0000';          // Vermelho Sangue Neon
     }
 
     reproduzir(parceiro) {
-        if (lista_celulas.length >= QTD_MAX_CELULAS) return;
+        if (lista_predadores.length >= QTD_MAX_PREDADORES) return;
 
         const genes_filho = {};
         const chaves = Object.keys(this.genes);
@@ -98,52 +95,55 @@ class Celula {
             genes_filho[key] = base;
         }
 
-        const filho = new Celula(genes_filho, this.x_real, this.y_real);
+        const filho = new Predador(genes_filho, this.x_real, this.y_real);
         filho.cooldown_reproducao = COOLDOWN_REPRODUCAO;
-        lista_celulas.push(filho);
+        lista_predadores.push(filho);
     }
 
     atualizar_sensores() {
         this.sensor = {
-            comida_esq: 0, comida_dir: 0, comida_cima: 0, comida_baixo: 0,
+            presa_esq: 0, presa_dir: 0, presa_cima: 0, presa_baixo: 0,
             vizinho_esq: 0, vizinho_dir: 0, vizinho_cima: 0, vizinho_baixo: 0
         };
 
         const raio_sq = RAIO_VISAO * RAIO_VISAO;
-        let tocando_alguem = false;
+        let tocando_parceiro = false;
 
-        // Comida
-        for (let i = 0; i < lista_comidas.length; i++) {
-            const c = lista_comidas[i];
-            const dx = c.x_real - this.x_real;
-            const dy = c.y_real - this.y_real;
+        // 1. PROCURA PRESAS (Células Normais)
+        // Percorre a lista de celulas importada
+        for (let i = 0; i < lista_celulas.length; i++) {
+            const presa = lista_celulas[i];
+            const dx = presa.x_real - this.x_real;
+            const dy = presa.y_real - this.y_real;
             const dist_sq = dx*dx + dy*dy;
             
             if (dist_sq < raio_sq) {
-                const forca = (1 - (Math.sqrt(dist_sq) / RAIO_VISAO)) * 2;
-                if (dx < 0) this.sensor.comida_esq += forca; 
-                else this.sensor.comida_dir += forca;        
-                if (dy < 0) this.sensor.comida_cima += forca;
-                else this.sensor.comida_baixo += forca;
+                // Sinal forte (multiplicado por 3) para priorizar caça
+                const forca = (1 - (Math.sqrt(dist_sq) / RAIO_VISAO)) * 3;
+                
+                if (dx < 0) this.sensor.presa_esq += forca; 
+                else this.sensor.presa_dir += forca;        
+                if (dy < 0) this.sensor.presa_cima += forca;
+                else this.sensor.presa_baixo += forca;
             }
         }
 
-        // Vizinhos
-        for (let i = 0; i < lista_celulas.length; i++) {
-            const outra = lista_celulas[i];
-            if (outra === this) continue;
+        // 2. SENTE OUTROS PREDADORES (Vizinhos/Parceiros)
+        for (let i = 0; i < lista_predadores.length; i++) {
+            const outro = lista_predadores[i];
+            if (outro === this) continue;
 
-            const dx = outra.x_real - this.x_real;
-            const dy = outra.y_real - this.y_real;
+            const dx = outro.x_real - this.x_real;
+            const dy = outro.y_real - this.y_real;
             const dist_sq = dx*dx + dy*dy;
 
-            const raio_toque = this.raio_real + outra.raio_real;
+            const raio_toque = this.raio_real + outro.raio_real;
             if (dist_sq < raio_toque * raio_toque) {
-                tocando_alguem = true;
-                if (this.cooldown_reproducao <= 0 && outra.cooldown_reproducao <= 0 && this.vida > 60) {
-                    this.reproduzir(outra);
+                tocando_parceiro = true;
+                if (this.cooldown_reproducao <= 0 && outro.cooldown_reproducao <= 0 && this.vida > 150) {
+                    this.reproduzir(outro);
                     this.cooldown_reproducao = COOLDOWN_REPRODUCAO;
-                    outra.cooldown_reproducao = COOLDOWN_REPRODUCAO;
+                    outro.cooldown_reproducao = COOLDOWN_REPRODUCAO;
                     this.vida -= CUSTO_REPRODUCAO;
                 }
             }
@@ -156,20 +156,26 @@ class Celula {
                 else this.sensor.vizinho_baixo += forca;
             }
         }
-        this.cor_neon = tocando_alguem ? '#FF69B4' : '#0026ffff';
+        
+        // Predador fica Roxo/Rosa se estiver reproduzindo, senão Vermelho Neon
+        this.cor_neon = tocando_parceiro ? '#FF00FF' : '#FF0000';
     }
 
-    comer() {
-        for (let i = lista_comidas.length - 1; i >= 0; i--) {
-            const c = lista_comidas[i];
-            const dx = this.x_real - c.x_real;
-            const dy = this.y_real - c.y_real;
-            const soma_raios = this.raio_real + c.raio_real;
+    caçar() {
+        // Percorre a lista de presas de trás para frente para poder remover
+        for (let i = lista_celulas.length - 1; i >= 0; i--) {
+            const presa = lista_celulas[i];
 
+            const dx = this.x_real - presa.x_real;
+            const dy = this.y_real - presa.y_real;
+            const soma_raios = this.raio_real + presa.raio_real;
+
+            // Colisão Simples (Círculo com Círculo)
             if ((dx*dx + dy*dy) < soma_raios*soma_raios) {
-                lista_comidas.splice(i, 1);
-                notificar_comida_comida(); 
-                this.vida += GANHO_COMIDA;
+                // NHAC!
+                lista_celulas.splice(i, 1); // Remove a célula normal do mundo
+                
+                this.vida += GANHO_AO_COMER;
                 if (this.vida > VIDA_MAXIMA) this.vida = VIDA_MAXIMA;
             }
         }
@@ -178,7 +184,8 @@ class Celula {
     tomar_decisao_e_mover() {
         this.vida -= PERDA_POR_FRAME;
         if (this.cooldown_reproducao > 0) this.cooldown_reproducao--;
-        this.comer(); 
+        
+        this.caçar(); // Tenta comer presas próximas
 
         this.tick_interno++;
         
@@ -186,10 +193,11 @@ class Celula {
             this.atualizar_sensores();
             const s = this.sensor;
             
-            const in_ce = Math.min(1, s.comida_esq);
-            const in_cd = Math.min(1, s.comida_dir);
-            const in_cc = Math.min(1, s.comida_cima);
-            const in_cb = Math.min(1, s.comida_baixo);
+            // Inputs
+            const in_pe = Math.min(1, s.presa_esq);
+            const in_pd = Math.min(1, s.presa_dir);
+            const in_pc = Math.min(1, s.presa_cima);
+            const in_pb = Math.min(1, s.presa_baixo);
             
             const in_ve = Math.min(1, s.vizinho_esq);
             const in_vd = Math.min(1, s.vizinho_dir);
@@ -197,21 +205,21 @@ class Celula {
             const in_vb = Math.min(1, s.vizinho_baixo);
             
             const in_vida = this.vida / VIDA_MAXIMA;
-            // Normaliza posição pelo Limite Mortal e não pelo mapa de nascimento
             const in_pos_x = this.x_real / LIMITE_MORTAL;
             const in_pos_y = this.y_real / LIMITE_MORTAL;
 
+            // Rede Neural
             let vx = this.genes.bias_x + 
-                     (in_ce * this.genes.w_comida_esq_x) + 
-                     (in_cd * this.genes.w_comida_dir_x) +
+                     (in_pe * this.genes.w_presa_esq_x) + 
+                     (in_pd * this.genes.w_presa_dir_x) +
                      (in_ve * this.genes.w_vizinho_esq_x) +
                      (in_vd * this.genes.w_vizinho_dir_x) +
                      (in_vida * this.genes.w_vida_x) +
                      (in_pos_x * this.genes.w_pos_x);
 
             let vy = this.genes.bias_y +
-                     (in_cc * this.genes.w_comida_cima_y) +
-                     (in_cb * this.genes.w_comida_baixo_y) +
+                     (in_pc * this.genes.w_presa_cima_y) +
+                     (in_pb * this.genes.w_presa_baixo_y) +
                      (in_vc * this.genes.w_vizinho_cima_y) +
                      (in_vb * this.genes.w_vizinho_baixo_y) +
                      (in_vida * this.genes.w_vida_y) +
@@ -230,7 +238,7 @@ class Celula {
         this.x_real += this.vel_x_cache;
         this.y_real += this.vel_y_cache;
 
-        // Limite Mortal Retangular
+        // Limite Mortal (Igual ao das células)
         if (this.x_real > LIMITE_MORTAL || this.x_real < -LIMITE_MORTAL ||
             this.y_real > LIMITE_MORTAL || this.y_real < -LIMITE_MORTAL) {
             this.vida = 0;
@@ -256,19 +264,18 @@ class Celula {
         ctx.fill();
         ctx.stroke();
         ctx.globalAlpha = 1.0;
-        ctx.shadowBlur = 0;
     }
 }
 
-export function gerar_celulas() {
-    for (let i = 0; i < QUANTIDADE_MIN; i++) lista_celulas.push(new Celula());
-    console.log(`População inicial: ${lista_celulas.length}`);
+export function gerar_predadores() {
+    for (let i = 0; i < QUANTIDADE_MIN; i++) lista_predadores.push(new Predador());
+    console.log(`PREDADORES LIBERADOS: ${lista_predadores.length}`);
 }
 
-export function desenhar_todas_celulas(dx, dy) {
-    for (let i = lista_celulas.length - 1; i >= 0; i--) {
-        const c = lista_celulas[i];
-        if (c.vida <= 0) { lista_celulas.splice(i, 1); continue; }
-        c.desenhar(dx, dy);
+export function desenhar_todos_predadores(dx, dy) {
+    for (let i = lista_predadores.length - 1; i >= 0; i--) {
+        const p = lista_predadores[i];
+        if (p.vida <= 0) { lista_predadores.splice(i, 1); continue; }
+        p.desenhar(dx, dy);
     }
 }
