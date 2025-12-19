@@ -4,11 +4,11 @@ import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
 import { lista_comidas, notificar_comida_comida } from './comidas.js'; 
 
 // --- CONFIGURAÇÕES DE EQUILÍBRIO ---
-const QUANTIDADE_MIN = 300; 
-export const QTD_MAX_CELULAS = 500;
+const QUANTIDADE_MIN = 600; 
+export const QTD_MAX_CELULAS = 800;
 
 // Mapa onde elas NASCEM
-export const TAMANHO_MAPA_CELULAS = 900; 
+export const TAMANHO_MAPA_CELULAS = 1200; 
 
 // LIMITE MORTAL: Ajustado para ficar logo depois da comida (que vai até 1350)
 // Se for muito longe, elas vagam no vazio e a simulação fica lenta/chata.

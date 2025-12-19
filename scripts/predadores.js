@@ -5,14 +5,14 @@ import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
 import { lista_celulas, LIMITE_MORTAL, TAMANHO_MAPA_CELULAS } from './celulas.js';
 
 // --- CONFIGURAÇÕES DOS PREDADORES ---
-const QUANTIDADE_MIN = 50;
-const QTD_MAX_PREDADORES = 100;
+const QUANTIDADE_MIN = 120;
+const QTD_MAX_PREDADORES = 150;
 
-const RAIO_PREDADOR = 14; // Dobro do tamanho (7 * 2)
+const RAIO_PREDADOR = 17; // Dobro do tamanho (7 * 2)
 const RAIO_VISAO = 500;   // Visão aguçada para caça
 
-const VIDA_INICIAL = 400;
-const VIDA_MAXIMA = 400;
+const VIDA_INICIAL = 500;
+const VIDA_MAXIMA = 500;
 const PERDA_POR_FRAME = 0.06; // Gasta mais energia que a célula normal
 const GANHO_AO_COMER = 100;  // Comer uma presa enche bastante a barriga
 
@@ -158,7 +158,7 @@ class Predador {
         }
         
         // Predador fica Roxo/Rosa se estiver reproduzindo, senão Vermelho Neon
-        this.cor_neon = tocando_parceiro ? '#FF00FF' : '#FF0000';
+        this.cor_neon = tocando_parceiro ? '#ff8800ff' : '#FF0000';
     }
 
     caçar() {
