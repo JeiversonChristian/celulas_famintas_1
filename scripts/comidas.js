@@ -3,14 +3,13 @@
 import { ctx, largura_tela_real, altura_tela_real, zoom } from './canvas.js';
 
 // --- ATENÇÃO: Valores sincronizados com celulas.js ---
-const TAMANHO_MAPA_CELULAS = 1200;
-const QTD_MAX_CELULAS = 800;
+const TAMANHO_MAPA_CELULAS = 1000;
 
 // Configurações da Comida
 // 1.5x o mapa de células = 1350.
 const TAMANHO_MAPA = TAMANHO_MAPA_CELULAS * 1.5; 
-const QTD_MAX = 2000;             
-const QTD_MIN = 1500;                     
+const QTD_MAX = 5000;             
+const QTD_MIN = 5000;                     
 const RAIO = 2.5;
 
 export const lista_comidas = [];

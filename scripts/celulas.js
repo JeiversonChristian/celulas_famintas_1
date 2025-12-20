@@ -26,7 +26,7 @@ const GANHO_COMIDA = 30;      // Ganha razoável
 const COOLDOWN_REPRODUCAO = 300; 
 const TAXA_MUTACAO = 0.15;       
 const CUSTO_REPRODUCAO = 50;     
-const VELOCIDADE_MAXIMA = 4;
+const VELOCIDADE_MAXIMA = 8;
 
 const INTERVALO_PENSAMENTO = 3; 
 

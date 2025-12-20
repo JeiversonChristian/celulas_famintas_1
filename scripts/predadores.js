@@ -19,7 +19,7 @@ const GANHO_AO_COMER = 100;  // Comer uma presa enche bastante a barriga
 const COOLDOWN_REPRODUCAO = 400; // Reprodução mais lenta
 const TAXA_MUTACAO = 0.1; 
 const CUSTO_REPRODUCAO = 80;     // Custa caro reproduzir
-const VELOCIDADE_MAXIMA = 4.2;   // Levemente mais rápidos que as presas (4.0)
+const VELOCIDADE_MAXIMA = 16;   // Levemente mais rápidos que as presas (4.0)
 
 const INTERVALO_PENSAMENTO = 3;
 
